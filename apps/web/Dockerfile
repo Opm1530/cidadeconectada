@@ -8,11 +8,7 @@ COPY package.json package-lock.json ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/database/package.json ./packages/database/
 COPY packages/shared/package.json ./packages/shared/
-RUN npm install \
-    --workspace=apps/web \
-    --workspace=packages/database \
-    --workspace=packages/shared \
-    --ignore-scripts
+RUN npm install --workspaces
 
 # ─── Build ───
 FROM base AS builder
