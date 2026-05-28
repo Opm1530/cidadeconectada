@@ -10,6 +10,21 @@ const OWNER_EMAIL = 'sabore@campoalegre.com.br'
 const OWNER_NAME  = 'Saborê Açaiteria Campo Alegre'
 // ─────────────────────────────────────────────────────────────────────────────
 
+const IMG = {
+  acai:         'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=600&q=80&fit=crop',
+  acai_shake:   'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=600&q=80&fit=crop',
+  sorvete:      'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&q=80&fit=crop',
+  sorvete_cone: 'https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=600&q=80&fit=crop',
+  milkshake:    'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=600&q=80&fit=crop',
+  picole:       'https://images.unsplash.com/photo-1488900128323-21503983a07e?w=600&q=80&fit=crop',
+  brownie:      'https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=600&q=80&fit=crop',
+  chocolate_q:  'https://images.unsplash.com/photo-1542990253-a781e9c2e36c?w=600&q=80&fit=crop',
+  pote:         'https://images.unsplash.com/photo-1548345680-f5475ea5df84?w=600&q=80&fit=crop',
+  bebida:       'https://images.unsplash.com/photo-1527960471264-932f39eb5846?w=600&q=80&fit=crop',
+  fruta:        'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=600&q=80&fit=crop',
+  complemento:  'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=600&q=80&fit=crop',
+}
+
 async function clearProducts(companyId: string) {
   const existing = await prisma.product.findMany({ where: { companyId }, select: { id: true } })
   const ids = existing.map(p => p.id)
@@ -214,7 +229,7 @@ async function main() {
   // AÇAÍ
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Açaí', companyId: c, order: order++, price: 0, category: 'Açaí',
+    name: 'Açaí', companyId: c, order: order++, price: 0, category: 'Açaí', imageUrl: IMG.acai,
     description: 'Seu açaí pode ir com 5 complementos tradicionais sem nenhum custo, sendo cobrado separadamente apenas os complementos premium.',
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu açaí?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
@@ -236,7 +251,7 @@ async function main() {
   // AÇAÍ 250ml
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Açaí 250ml 2 complementos', companyId: c, order: order++, price: 13, category: 'Açaí 250ml',
+    name: 'Açaí 250ml 2 complementos', companyId: c, order: order++, price: 13, category: 'Açaí 250ml', imageUrl: IMG.acai,
     description: 'Açaí de 250ml com até 2 complementos e possibilidade de 1 adicional extra.',
     optionGroups: { create: [
       { name: 'Escolha até 2 complementos', type: 'MULTIPLE', required: false, minSelect: 0, maxSelect: 2, order: 0,
@@ -263,7 +278,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Açaí 250ml 5 complementos', companyId: c, order: order++, price: 14, category: 'Açaí 250ml',
+    name: 'Açaí 250ml 5 complementos', companyId: c, order: order++, price: 14, category: 'Açaí 250ml', imageUrl: IMG.acai,
     description: 'Açaí de 250ml com até 5 complementos e possibilidade de 1 adicional extra.',
     optionGroups: { create: [
       { name: 'Escolha até 5 complementos Grátis', type: 'MULTIPLE', required: false, minSelect: 0, maxSelect: 5, order: 0,
@@ -283,7 +298,7 @@ async function main() {
   // AÇAÍ TRIO
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Açaí Trio', companyId: c, order: order++, price: 0, category: 'Açaí Trio',
+    name: 'Açaí Trio', companyId: c, order: order++, price: 0, category: 'Açaí Trio', imageUrl: IMG.acai,
     description: 'Açaí com até 3 cremes divididos em camadas, onde cada parte do seu açaí tem um sabor especial!',
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu açaí Trio?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
@@ -314,7 +329,7 @@ async function main() {
   // AÇAÍ SHAKE
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Açaí Shake', companyId: c, order: order++, price: 0, category: 'Açaí Shake',
+    name: 'Açaí Shake', companyId: c, order: order++, price: 0, category: 'Açaí Shake', imageUrl: IMG.acai_shake,
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu açaí shake?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: [
@@ -341,7 +356,7 @@ async function main() {
   // CASADINHO
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Casadinho camadinha', companyId: c, order: order++, price: 0, category: 'Casadinho',
+    name: 'Casadinho camadinha', companyId: c, order: order++, price: 0, category: 'Casadinho', imageUrl: IMG.acai,
     description: 'Combinação perfeita do açaí com sorvete de baunilha: duas camadas de açaí + duas camadas de sorvete e 4 complementos.',
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu açaí?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
@@ -381,7 +396,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Casadinho duplo', companyId: c, order: order++, price: 0, category: 'Casadinho',
+    name: 'Casadinho duplo', companyId: c, order: order++, price: 0, category: 'Casadinho', imageUrl: IMG.acai,
     description: 'Combinação perfeita entre cremosidade e um contraste que se encaixa perfeitamente mesclando sabor e suavidade.',
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu casadinho?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
@@ -410,7 +425,7 @@ async function main() {
   // SORVETES
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Copo de sorvete', companyId: c, order: order++, price: 0, category: 'Sorvetes',
+    name: 'Copo de sorvete', companyId: c, order: order++, price: 0, category: 'Sorvetes', imageUrl: IMG.sorvete,
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu Sorvete?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: [
@@ -426,7 +441,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Copo de sorvete MIX', companyId: c, order: order++, price: 0, category: 'Sorvetes',
+    name: 'Copo de sorvete MIX', companyId: c, order: order++, price: 0, category: 'Sorvetes', imageUrl: IMG.sorvete,
     optionGroups: { create: [
       { name: 'Qual o tamanho do copo?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: [
@@ -452,7 +467,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Sundae', companyId: c, order: order++, price: 7.5, category: 'Sorvetes',
+    name: 'Sundae', companyId: c, order: order++, price: 7.5, category: 'Sorvetes', imageUrl: IMG.sorvete,
     optionGroups: { create: [
       { name: 'Escolha o sabor do seu sorvete', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: SABOR_SORVETE } },
@@ -487,7 +502,7 @@ async function main() {
   // BIG COPO SORVETE
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Big Copo Sorvete', companyId: c, order: order++, price: 0, category: 'Big Copo Sorvete',
+    name: 'Big Copo Sorvete', companyId: c, order: order++, price: 0, category: 'Big Copo Sorvete', imageUrl: IMG.sorvete,
     description: 'Monte seu sorvete com as combinações de sua escolha.',
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu sorvete?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
@@ -513,7 +528,7 @@ async function main() {
   // SORVETE DUO
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Sorvete Duo', companyId: c, order: order++, price: 0, category: 'Sorvete Duo',
+    name: 'Sorvete Duo', companyId: c, order: order++, price: 0, category: 'Sorvete Duo', imageUrl: IMG.sorvete,
     description: 'Sorvete com 2 cremes para criar sua combinação favorita.',
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu sorvete Duo?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
@@ -564,7 +579,7 @@ async function main() {
   ]
 
   await prisma.product.create({ data: {
-    name: 'Casquinha', companyId: c, order: order++, price: 5, category: 'Cascas',
+    name: 'Casquinha', companyId: c, order: order++, price: 5, category: 'Cascas', imageUrl: IMG.sorvete_cone,
     optionGroups: { create: [
       { name: 'Escolha o sabor do seu sorvete', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: SABOR_SORVETE } },
@@ -576,7 +591,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Cascão', companyId: c, order: order++, price: 6, category: 'Cascas',
+    name: 'Cascão', companyId: c, order: order++, price: 6, category: 'Cascas', imageUrl: IMG.sorvete_cone,
     optionGroups: { create: [
       { name: 'Escolha o sabor do seu sorvete', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: SABOR_SORVETE } },
@@ -588,7 +603,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Cestinha', companyId: c, order: order++, price: 8, category: 'Cascas',
+    name: 'Cestinha', companyId: c, order: order++, price: 8, category: 'Cascas', imageUrl: IMG.sorvete_cone,
     optionGroups: { create: [
       { name: 'Escolha o sabor do seu sorvete', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: SABOR_SORVETE } },
@@ -612,7 +627,7 @@ async function main() {
   // MIX FRUTA
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Mix Fruta', companyId: c, order: order++, price: 0, category: 'Mix Fruta',
+    name: 'Mix Fruta', companyId: c, order: order++, price: 0, category: 'Mix Fruta', imageUrl: IMG.fruta,
     description: 'Sorvete com polpa de fruta.',
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu Mix Fruta?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
@@ -637,7 +652,7 @@ async function main() {
   // MILK SHAKE
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Milk Shake Tradicional', companyId: c, order: order++, price: 0, category: 'Milk Shake',
+    name: 'Milk Shake Tradicional', companyId: c, order: order++, price: 0, category: 'Milk Shake', imageUrl: IMG.milkshake,
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu Milk Shake?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: [
@@ -668,7 +683,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Milk Shake Premium', companyId: c, order: order++, price: 0, category: 'Milk Shake',
+    name: 'Milk Shake Premium', companyId: c, order: order++, price: 0, category: 'Milk Shake', imageUrl: IMG.milkshake,
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu Milk Shake?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: [
@@ -701,7 +716,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Milk Shake Especial', companyId: c, order: order++, price: 0, category: 'Milk Shake',
+    name: 'Milk Shake Especial', companyId: c, order: order++, price: 0, category: 'Milk Shake', imageUrl: IMG.milkshake,
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu Milk Shake?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: [
@@ -724,7 +739,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Café Shake', companyId: c, order: order++, price: 0, category: 'Milk Shake',
+    name: 'Café Shake', companyId: c, order: order++, price: 0, category: 'Milk Shake', imageUrl: IMG.milkshake,
     optionGroups: { create: [
       { name: 'Qual o tamanho do seu Milk Shake?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: [
@@ -753,7 +768,7 @@ async function main() {
   // PICOLÉS
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Picolé base fruta', companyId: c, order: order++, price: 0, category: 'Picolés',
+    name: 'Picolé base fruta', companyId: c, order: order++, price: 0, category: 'Picolés', imageUrl: IMG.picole,
     description: 'Picolés de fruta sem leite e derivados. Zero gluten, zero lactose, zero saborizante industrial.',
     optionGroups: { create: [
       { name: 'Base Fruta', type: 'MULTIPLE', required: true, minSelect: 1, maxSelect: 20, order: 0,
@@ -769,7 +784,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Picolé base leite', companyId: c, order: order++, price: 0, category: 'Picolés',
+    name: 'Picolé base leite', companyId: c, order: order++, price: 0, category: 'Picolés', imageUrl: IMG.picole,
     description: 'Picolé base leite. Contém lactose.',
     optionGroups: { create: [
       { name: 'Picolé base leite', type: 'MULTIPLE', required: true, minSelect: 1, maxSelect: 20, order: 0,
@@ -796,7 +811,7 @@ async function main() {
   // POTES
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Potes (2L)', companyId: c, order: order++, price: 45, category: 'Potes',
+    name: 'Potes (2L)', companyId: c, order: order++, price: 45, category: 'Potes', imageUrl: IMG.pote,
     optionGroups: { create: [
       { name: 'Qual sabor do pote?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: [
@@ -809,7 +824,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Pote de 300ml', companyId: c, order: order++, price: 14, category: 'Potes',
+    name: 'Pote de 300ml', companyId: c, order: order++, price: 14, category: 'Potes', imageUrl: IMG.pote,
     optionGroups: { create: [
       { name: 'Sabores', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
         options: { create: [
@@ -824,7 +839,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Pote de açaí 300ml zero', companyId: c, order: order++, price: 15, category: 'Potes',
+    name: 'Pote de açaí 300ml zero', companyId: c, order: order++, price: 15, category: 'Potes', imageUrl: IMG.acai,
     optionGroups: { create: [
       { name: 'Adicionais separados', type: 'MULTIPLE', required: false, minSelect: 0, maxSelect: 20, order: 0,
         options: { create: ADICIONAIS_SEPARADOS } },
@@ -835,7 +850,7 @@ async function main() {
   // CONVENIÊNCIA
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Bebidas', companyId: c, order: order++, price: 0, category: 'Conveniência',
+    name: 'Bebidas', companyId: c, order: order++, price: 0, category: 'Conveniência', imageUrl: IMG.bebida,
     optionGroups: { create: [
       { name: 'Algo para beber?', type: 'MULTIPLE', required: true, minSelect: 1, maxSelect: 10, order: 0,
         options: { create: [
@@ -849,7 +864,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Baleiro', companyId: c, order: order++, price: 0, category: 'Conveniência',
+    name: 'Baleiro', companyId: c, order: order++, price: 0, category: 'Conveniência', imageUrl: IMG.complemento,
     optionGroups: { create: [
       { name: 'Algo para acompanhar seu pedido?', type: 'MULTIPLE', required: true, minSelect: 1, maxSelect: 10, order: 0,
         options: { create: [
@@ -869,7 +884,7 @@ async function main() {
   // DIVERSOS
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Potes de complemento', companyId: c, order: order++, price: 0, category: 'Diversos',
+    name: 'Potes de complemento', companyId: c, order: order++, price: 0, category: 'Diversos', imageUrl: IMG.complemento,
     description: 'Adicionais separados por pote para completar seu pedido.',
     optionGroups: { create: [
       { name: 'Adicionais separados', type: 'MULTIPLE', required: true, minSelect: 1, maxSelect: 20, order: 0,
@@ -881,7 +896,7 @@ async function main() {
   // TEMPORADA DE FRIO
   // ══════════════════════════════════════════════════════════════════════════
   await prisma.product.create({ data: {
-    name: 'Chocolate Quente', companyId: c, order: order++, price: 18, category: 'Temporada de Frio',
+    name: 'Chocolate Quente', companyId: c, order: order++, price: 18, category: 'Temporada de Frio', imageUrl: IMG.chocolate_q,
     description: 'Feito com chocolate de verdade, nosso chocolate quente tem sabor intenso, textura cremosa e uma experiência única em cada gole.',
     optionGroups: { create: [
       { name: 'Adicionais', type: 'MULTIPLE', required: false, minSelect: 0, maxSelect: 8, order: 0,
@@ -890,7 +905,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Brownie', companyId: c, order: order++, price: 12, category: 'Temporada de Frio',
+    name: 'Brownie', companyId: c, order: order++, price: 12, category: 'Temporada de Frio', imageUrl: IMG.brownie,
     description: 'Brownie macio e intenso no chocolate, servido individualmente.',
     optionGroups: { create: [
       { name: 'Calda por cima?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
@@ -904,7 +919,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Brownie com sorvete', companyId: c, order: order++, price: 17.99, category: 'Temporada de Frio',
+    name: 'Brownie com sorvete', companyId: c, order: order++, price: 17.99, category: 'Temporada de Frio', imageUrl: IMG.brownie,
     description: 'Brownie acompanhado de sorvete de creme, feito com ingredientes selecionados. Finalizado com uma leve camada de calda.',
     optionGroups: { create: [
       { name: 'Calda por cima?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
@@ -918,7 +933,7 @@ async function main() {
   } })
 
   await prisma.product.create({ data: {
-    name: 'Chocolate quente com brownie', companyId: c, order: order++, price: 27.99, category: 'Temporada de Frio',
+    name: 'Chocolate quente com brownie', companyId: c, order: order++, price: 27.99, category: 'Temporada de Frio', imageUrl: IMG.chocolate_q,
     description: 'Chocolate quente intenso e cremoso, feito com chocolate de verdade, acompanhado de brownie com uma leve camada de calda.',
     optionGroups: { create: [
       { name: 'Calda por cima?', type: 'SINGLE', required: true, minSelect: 1, maxSelect: 1, order: 0,
