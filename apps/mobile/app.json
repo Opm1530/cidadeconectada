@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "Cidade Conectada",
+    "slug": "cidade-conectada",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "cidadeconectada",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#c026d3"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "br.com.cidadeconectada.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#c026d3"
+      },
+      "package": "br.com.cidadeconectada.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#62a84a"
+        }
+      ],
+      "expo-secure-store",
+      "expo-asset",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Cidade Conectada precisa acessar sua galeria para adicionar imagens aos produtos e à loja."
+        }
+      ],
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

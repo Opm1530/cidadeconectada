@@ -1,0 +1,42 @@
+{
+  "name": "cidade-conectada",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "postinstall": "mkdir -p node_modules/ajv-keywords/node_modules && ln -sf $(pwd)/node_modules/ajv-formats/node_modules/ajv node_modules/ajv-keywords/node_modules/ajv || true",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "db:generate": "turbo run db:generate",
+    "db:push": "turbo run db:push",
+    "db:migrate": "turbo run db:migrate",
+    "db:studio": "turbo run db:studio",
+    "db:seed": "turbo run db:seed"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  },
+  "overrides": {
+    "ajv-keywords": {
+      "ajv": "^8.18.0"
+    },
+    "react": "19.2.5",
+    "react-dom": "19.2.5"
+  },
+  "packageManager": "npm@10.9.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@expo-google-fonts/poppins": "^0.4.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
+  }
+}

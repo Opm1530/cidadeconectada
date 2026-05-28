@@ -1,0 +1,719 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum Role {
+  SUPER_ADMIN
+  CITY_ADMIN
+  COMPANY_OWNER
+  CUSTOMER
+  DELIVERY_DRIVER
+}
+
+enum ProductType {
+  PRODUCT
+  SERVICE
+}
+
+enum OptionType {
+  SINGLE   // seleção única (radio)
+  MULTIPLE // múltipla escolha (checkbox)
+}
+
+enum OrderStatus {
+  CREATED           // pedido criado
+  WAITING_PAYMENT   // aguardando pagamento
+  PAID              // pago
+  PREPARING         // em preparo
+  READY_FOR_PICKUP  // pronto para o entregador buscar
+  OUT_FOR_DELIVERY  // saiu para entrega
+  DELIVERED         // entregue
+  CANCELLED         // cancelado
+}
+
+enum DeliveryType {
+  PICKUP          // retirada no local pelo cliente
+  OWN_DELIVERY    // entrega própria da empresa
+  PLATFORM_DRIVER // entregador cadastrado na plataforma
+}
+
+enum PaymentMethod {
+  MERCADO_PAGO
+  PIX
+  CASH_ON_DELIVERY
+}
+
+enum CouponType {
+  DISCOUNT_PERCENT  // desconto percentual (ex: 10%)
+  DISCOUNT_FIXED    // desconto em reais (ex: R$5)
+  FREE_SHIPPING     // frete grátis (só para entrega própria)
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  REFUNDED
+}
+
+enum DriverStatus {
+  PENDING   // aguardando aprovação do admin da cidade
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum DeliveryStatus {
+  PENDING    // aguardando entregador aceitar
+  ACCEPTED   // entregador aceitou
+  PICKED_UP  // entregador buscou o produto
+  DELIVERED  // entregue e confirmado com código
+  FAILED     // entrega falhou
+}
+
+enum BannerType {
+  CITY_HERO      // carrossel principal no topo do catálogo
+  STORE_HERO     // banner dentro de uma loja específica
+  HOME_GRID      // até 3 banners promocionais em grid na home
+  CART_BANNER    // 1 banner exibido na página do carrinho
+  PROMO_CAROUSEL // carrossel de banners promocionais no app abaixo das categorias
+}
+
+enum PollAudience {
+  MERCHANTS  // só lojistas (COMPANY_OWNER)
+  CUSTOMERS  // só clientes (CUSTOMER)
+  ALL        // todos
+}
+
+enum PollStatus {
+  DRAFT   // rascunho
+  ACTIVE  // enquete ativa
+  CLOSED  // encerrada
+}
+
+enum PollQuestionType {
+  SINGLE_CHOICE   // escolha única (radio)
+  MULTIPLE_CHOICE // múltipla escolha (checkbox)
+  TEXT            // resposta livre
+}
+
+enum NewsCategory {
+  GENERAL        // Geral
+  HEALTH         // Saúde
+  SECURITY       // Segurança
+  EVENTS         // Eventos
+  INFRASTRUCTURE // Infraestrutura
+  ECONOMY        // Economia
+  ENVIRONMENT    // Meio Ambiente
+  EDUCATION      // Educação
+}
+
+enum NewsAudience {
+  MERCHANTS  // só lojistas
+  CUSTOMERS  // só clientes
+  ALL        // todos
+}
+
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+}
+
+// ─────────────────────────────────────────────
+// USUÁRIOS
+// ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  password  String
+  role      Role     @default(CUSTOMER)
+  avatarUrl  String?
+  pushToken  String?  // Expo push token para notificações móveis
+  active     Boolean  @default(true)
+
+  // Cidade padrão do usuário (obrigatório para todos exceto SUPER_ADMIN)
+  cityId String?
+  city   City?   @relation(fields: [cityId], references: [id])
+
+  // Relações
+  company        Company?
+  driver         DeliveryDriver?
+  orders         Order[]
+  refreshTokens  RefreshToken[]
+  cityAdmins     CityAdmin[]
+  pollResponses  PollResponse[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cityId])
+  @@index([email])
+}
+
+// Refresh tokens para autenticação JWT
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────
+// CIDADES
+// ─────────────────────────────────────────────
+
+model City {
+  id    String @id @default(cuid())
+  name  String
+  state String
+  slug  String @unique
+
+  active Boolean @default(true)
+
+  // Configurações de cadastro
+  freeCompanyRegistration Boolean @default(true)  // admin pode desativar aprovação manual
+  maxDrivers              Int?                     // null = sem limite de vagas de entregadores
+
+  // ─── Rodapé da cidade ───
+  footerAbout     String? // texto "sobre" no rodapé
+  footerPhone     String?
+  footerEmail     String?
+  footerAddress   String?
+  footerInstagram String?
+  footerFacebook  String?
+  footerWhatsapp  String?
+
+  // Relações
+  users         User[]
+  neighborhoods Neighborhood[]
+  companies     Company[]
+  banners       Banner[]
+  drivers       DeliveryDriver[]
+  cityAdmins    CityAdmin[]
+  polls         Poll[]
+  news          News[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}
+
+// Admins de cidade (um user pode ser admin de múltiplas cidades)
+model CityAdmin {
+  id     String @id @default(cuid())
+  userId String
+  cityId String
+  user   User   @relation(fields: [userId], references: [id])
+  city   City   @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, cityId])
+  @@index([cityId])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────
+// BAIRROS
+// ─────────────────────────────────────────────
+
+model Neighborhood {
+  id     String @id @default(cuid())
+  name   String
+  cityId String
+  city   City   @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, cityId])
+  @@index([cityId])
+}
+
+// ─────────────────────────────────────────────
+// BANNERS
+// ─────────────────────────────────────────────
+
+model Banner {
+  id       String     @id @default(cuid())
+  imageUrl String
+  link     String?
+  title    String?
+  subtitle String?
+  active   Boolean    @default(true)
+  order    Int        @default(0)
+  type     BannerType @default(CITY_HERO)
+
+  // Agendamento (null = sem limite)
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  cityId    String
+  city      City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  // Para banners de loja (type = STORE_HERO)
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cityId])
+  @@index([companyId])
+}
+
+// ─────────────────────────────────────────────
+// EMPRESAS
+// ─────────────────────────────────────────────
+
+model Company {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+  logoUrl     String?
+  coverUrl    String?
+  phone       String?
+  whatsapp    String?
+  address     String?
+  category    String? // ex: "Restaurante", "Mercado", "Serviços"
+  active      Boolean @default(true)
+
+  // Localização
+  cityId String
+  city   City   @relation(fields: [cityId], references: [id])
+
+  // Dono
+  ownerId String @unique
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  // ─── Configurações de Pagamento ───
+  acceptsMercadoPago    Boolean @default(false)
+  mercadoPagoToken      String? // token de acesso do Mercado Pago da empresa
+  acceptsPix            Boolean @default(false)
+  pixKey                String? // chave pix
+  acceptsCashOnDelivery Boolean @default(false)
+
+  // ─── Configurações de Entrega ───
+  hasOwnDelivery         Boolean  @default(false)
+  ownDeliveryFee         Decimal? @db.Decimal(10, 2)
+  acceptsPlatformDrivers Boolean  @default(false)
+
+  // ─── WhatsApp / Evolution API ───
+  evolutionApiInstance String? // nome da instância no Evolution
+  evolutionApiKey      String? // api key da instância
+
+  // Status de funcionamento
+  isOpen       Boolean @default(false)  // lojista abre manualmente; fecha automático pelo horário
+
+  // Horário de funcionamento (JSON flexível)
+  // { "0": { "enabled": true, "open": "10:00", "close": "22:00" }, ... } (0=Dom, 6=Sáb)
+  openingHours Json?
+
+  // Relações
+  products Product[]
+  orders   Order[]
+  banners  Banner[]
+  coupons  Coupon[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cityId])
+  @@index([slug])
+}
+
+// ─────────────────────────────────────────────
+// PRODUTOS E SERVIÇOS
+// ─────────────────────────────────────────────
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal     @db.Decimal(10, 2)
+  imageUrl    String?
+  category    String?     // ex: "Lanches", "Bebidas", "Sobremesas" — para filtro dentro da loja
+  type        ProductType @default(PRODUCT)
+  active      Boolean     @default(true)
+  order       Int         @default(0) // ordenação manual
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  optionGroups ProductOptionGroup[]
+  orderItems   OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+}
+
+// Grupos de opções (ex: "Tamanho", "Adicionais", "Ponto da carne")
+model ProductOptionGroup {
+  id        String     @id @default(cuid())
+  name      String
+  type      OptionType @default(SINGLE)
+  required  Boolean    @default(false)
+  minSelect Int        @default(0)
+  maxSelect Int        @default(1)
+  order     Int        @default(0)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  options ProductOption[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+// Itens das opções (ex: "P", "M", "G", "Queijo extra", "Bacon")
+model ProductOption {
+  id       String  @id @default(cuid())
+  name     String
+  priceAdd Decimal @default(0) @db.Decimal(10, 2) // valor adicionado ao preço base
+  active   Boolean @default(true)
+  order    Int     @default(0)
+
+  groupId String
+  group   ProductOptionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  orderItemOptions OrderItemOption[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([groupId])
+}
+
+// ─────────────────────────────────────────────
+// CUPONS DE DESCONTO
+// ─────────────────────────────────────────────
+
+model Coupon {
+  id        String     @id @default(cuid())
+  code      String     // código do cupom (ex: FRETE10)
+  type      CouponType
+  value     Decimal?   @db.Decimal(10, 2) // % para PERCENT, R$ para FIXED
+  minOrder  Decimal?   @db.Decimal(10, 2) // pedido mínimo para aplicar
+  maxUses   Int?       // null = ilimitado
+  usedCount Int        @default(0)
+  active    Boolean    @default(true)
+  expiresAt DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  orders Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, code]) // código único por empresa
+  @@index([companyId])
+}
+
+// ─────────────────────────────────────────────
+// PEDIDOS
+// ─────────────────────────────────────────────
+
+model Order {
+  id     String      @id @default(cuid())
+  number Int         // número sequencial por empresa (ex: #001, #002)
+  status OrderStatus @default(CREATED)
+
+  companyId  String
+  company    Company @relation(fields: [companyId], references: [id])
+  customerId String
+  customer   User    @relation(fields: [customerId], references: [id])
+
+  // Entrega
+  deliveryType    DeliveryType
+  deliveryAddress String?      // endereço de entrega digitado pelo cliente
+  deliveryFee     Decimal      @default(0) @db.Decimal(10, 2)
+
+  // Valores
+  subtotal       Decimal @db.Decimal(10, 2)
+  discountAmount Decimal @default(0) @db.Decimal(10, 2)
+  total          Decimal @db.Decimal(10, 2)
+
+  // Cupom
+  couponId String?
+  coupon   Coupon? @relation(fields: [couponId], references: [id])
+
+  notes String? // observações do cliente
+
+  // Relações
+  items    OrderItem[]
+  payment  Payment?
+  delivery Delivery?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, number]) // número único por empresa
+  @@index([companyId])
+  @@index([customerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity   Int
+  unitPrice  Decimal @db.Decimal(10, 2)
+  totalPrice Decimal @db.Decimal(10, 2)
+  notes      String? // observação do item (ex: "sem cebola")
+
+  // Snapshot do produto no momento da compra
+  productName String
+
+  options OrderItemOption[]
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+// Opções selecionadas em cada item do pedido
+model OrderItemOption {
+  id String @id @default(cuid())
+
+  orderItemId String
+  orderItem   OrderItem     @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  optionId    String
+  option      ProductOption @relation(fields: [optionId], references: [id])
+
+  // Snapshot da opção no momento da compra
+  name     String
+  priceAdd Decimal @db.Decimal(10, 2)
+
+  @@index([orderItemId])
+}
+
+// ─────────────────────────────────────────────
+// PAGAMENTOS
+// ─────────────────────────────────────────────
+
+model Payment {
+  id String @id @default(cuid())
+
+  orderId String  @unique
+  order   Order   @relation(fields: [orderId], references: [id])
+
+  method PaymentMethod
+  status PaymentStatus @default(PENDING)
+  amount Decimal       @db.Decimal(10, 2)
+
+  // Mercado Pago
+  mercadoPagoId          String? // ID do pagamento no MP
+  mercadoPagoExternalRef String? // referência externa
+  mercadoPagoCheckoutUrl String? // URL do checkout MP
+
+  // Pix
+  pixKey String? // chave pix usada
+
+  confirmedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// ENTREGADORES
+// ─────────────────────────────────────────────
+
+model DeliveryDriver {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+  cityId String
+  city   City   @relation(fields: [cityId], references: [id])
+
+  status      DriverStatus @default(PENDING)
+  deliveryFee Decimal      @db.Decimal(10, 2) // taxa cobrada pelo entregador
+  vehicle     String?      // ex: "Moto", "Bicicleta", "Carro"
+  vehiclePlate String?     // placa do veículo
+  active      Boolean      @default(false)    // disponível para entregas agora
+
+  // Documentos (URLs)
+  documentUrl String? // foto do documento
+  photoUrl    String? // foto do entregador
+
+  deliveries Delivery[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cityId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────
+// ENTREGAS
+// ─────────────────────────────────────────────
+
+model Delivery {
+  id String @id @default(cuid())
+
+  orderId  String         @unique
+  order    Order          @relation(fields: [orderId], references: [id])
+  driverId String?
+  driver   DeliveryDriver? @relation(fields: [driverId], references: [id])
+
+  status           DeliveryStatus @default(PENDING)
+  confirmationCode String         // código de 4 dígitos que o cliente mostra ao entregador
+
+  acceptedAt  DateTime?
+  pickedUpAt  DateTime?
+  deliveredAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([driverId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────
+// ENQUETES (comunicação prefeitura → população)
+// ─────────────────────────────────────────────
+
+model Poll {
+  id          String       @id @default(cuid())
+  cityId      String
+  city        City         @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  audience    PollAudience @default(ALL)
+  status      PollStatus   @default(DRAFT)
+
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  questions PollQuestion[]
+  responses PollResponse[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cityId])
+  @@index([status])
+}
+
+model PollQuestion {
+  id       String           @id @default(cuid())
+  pollId   String
+  poll     Poll             @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  text     String
+  type     PollQuestionType @default(SINGLE_CHOICE)
+  required Boolean          @default(true)
+  order    Int              @default(0)
+
+  options PollOption[]
+  answers PollAnswer[]
+
+  @@index([pollId])
+}
+
+model PollOption {
+  id         String       @id @default(cuid())
+  questionId String
+  question   PollQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  order      Int          @default(0)
+
+  answers PollAnswer[]
+
+  @@index([questionId])
+}
+
+model PollResponse {
+  id     String @id @default(cuid())
+  pollId String
+  poll   Poll   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  answers PollAnswer[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([pollId, userId]) // cada usuário vota uma vez
+  @@index([pollId])
+  @@index([userId])
+}
+
+model PollAnswer {
+  id         String       @id @default(cuid())
+  responseId String
+  response   PollResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  questionId String
+  question   PollQuestion @relation(fields: [questionId], references: [id])
+
+  // Para SINGLE_CHOICE / MULTIPLE_CHOICE
+  optionId String?
+  option   PollOption? @relation(fields: [optionId], references: [id])
+
+  // Para TEXT
+  textAnswer String?
+
+  @@index([responseId])
+  @@index([questionId])
+  @@index([optionId])
+}
+
+// ─────────────────────────────────────────────
+// NOTÍCIAS / COMUNICADOS DA PREFEITURA
+// ─────────────────────────────────────────────
+
+model News {
+  id          String       @id @default(cuid())
+  cityId      String
+  city        City         @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  title       String
+  summary     String?      // resumo exibido na listagem
+  content     String       // corpo completo (texto longo)
+  imageUrl    String?      // imagem de capa
+  category    NewsCategory @default(GENERAL)
+  audience    NewsAudience @default(ALL)
+  status      NewsStatus   @default(DRAFT)
+
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cityId])
+  @@index([status])
+  @@index([publishedAt])
+}
