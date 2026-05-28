@@ -12,7 +12,7 @@ services:
     ports:
       - '3000:3000'
     networks:
-      - docker-internal
+      - docker_internal
 
   worker:
     build:
@@ -23,8 +23,8 @@ services:
     env_file:
       - apps/web/.env
     networks:
-      - docker-internal
+      - docker_internal
 
 networks:
-  docker-internal:
+  docker_internal:
     external: true
