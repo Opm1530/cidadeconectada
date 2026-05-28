@@ -9,6 +9,7 @@
     "db:migrate:prod": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:acaiteria": "tsx prisma/seed-acaiteria-campoalegre.ts",
     "db:reset": "prisma migrate reset"
   },
   "dependencies": {
