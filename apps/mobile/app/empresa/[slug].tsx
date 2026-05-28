@@ -14,7 +14,7 @@ import { useCartStore } from '@/store/cart'
 import { formatCurrency } from '@cc/shared'
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
-interface ProductOption { id: string; name: string; priceAdd: number }
+interface ProductOption { id: string; name: string; priceAdd: number; imageUrl?: string | null }
 interface OptionGroup {
   id: string; name: string; type: 'SINGLE' | 'MULTIPLE'
   required: boolean; minSelect: number; maxSelect: number
@@ -151,6 +151,9 @@ function ProductModal({ product, companyColors, onClose, onAdd }: ProductModalPr
                       <Text style={[modal.optionName, isSelected && modal.optionNameSelected]}>{option.name}</Text>
                       {Number(option.priceAdd) > 0 && (
                         <Text style={modal.optionPrice}>+{formatCurrency(Number(option.priceAdd))}</Text>
+                      )}
+                      {option.imageUrl && (
+                        <Image source={{ uri: option.imageUrl }} style={modal.optionImg} contentFit="cover" />
                       )}
                     </TouchableOpacity>
                   )
@@ -426,6 +429,7 @@ const modal = StyleSheet.create({
   optionName: { flex: 1, fontSize: 14, color: '#374151' },
   optionNameSelected: { color: '#62a84a', fontWeight: '600' },
   optionPrice: { fontSize: 13, color: '#6b7280', fontWeight: '600' },
+  optionImg: { width: 52, height: 52, borderRadius: 8, flexShrink: 0 },
   footer: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderTopWidth: 1, borderTopColor: '#f3f4f6' },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: '#f9fafb', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
   qtyBtn: { padding: 2 },

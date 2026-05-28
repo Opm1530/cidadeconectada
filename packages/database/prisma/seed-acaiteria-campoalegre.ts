@@ -159,10 +159,10 @@ const ADICIONAIS_EXTRAS_OPCIONAL = [
 ]
 
 const ADICIONAIS_TEMPORADA = [
-  { name: 'Sorvete',          priceAdd: 5,  order: 0 },
-  { name: 'Calda',            priceAdd: 3,  order: 1 },
-  { name: 'Brownie',          priceAdd: 12, order: 2 },
-  { name: 'Chocolate quente', priceAdd: 18, order: 3 },
+  { name: 'Sorvete',          priceAdd: 5,  order: 0, imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=200&q=80&fit=crop' },
+  { name: 'Calda',            priceAdd: 3,  order: 1, imageUrl: 'https://images.unsplash.com/photo-1548365328-8c6db3220e4c?w=200&q=80&fit=crop' },
+  { name: 'Brownie',          priceAdd: 12, order: 2, imageUrl: 'https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=200&q=80&fit=crop' },
+  { name: 'Chocolate quente', priceAdd: 18, order: 3, imageUrl: 'https://images.unsplash.com/photo-1542990253-a781e9c2e36c?w=200&q=80&fit=crop' },
 ]
 
 async function main() {

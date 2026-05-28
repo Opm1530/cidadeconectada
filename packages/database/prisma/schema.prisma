@@ -392,6 +392,7 @@ model ProductOptionGroup {
 model ProductOption {
   id       String  @id @default(cuid())
   name     String
+  imageUrl String?
   priceAdd Decimal @default(0) @db.Decimal(10, 2) // valor adicionado ao preço base
   active   Boolean @default(true)
   order    Int     @default(0)
