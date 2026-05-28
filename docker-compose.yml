@@ -9,8 +9,6 @@ services:
     restart: unless-stopped
     env_file:
       - apps/web/.env
-    ports:
-      - '3000:3000'
     networks:
       - docker_internal
 
