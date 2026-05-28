@@ -62,6 +62,10 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     )
   }
 
+  // Remove registros dependentes sem cascade antes de apagar o usuário
+  await prisma.deliveryDriver.deleteMany({ where: { userId } })
+  await prisma.cityAdmin.deleteMany({ where: { userId } })
+
   await prisma.user.delete({ where: { id: userId } })
   return ok({ deleted: true })
 }
