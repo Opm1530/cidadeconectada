@@ -26,17 +26,10 @@
   "overrides": {
     "ajv-keywords": {
       "ajv": "^8.18.0"
-    },
-    "react": "19.2.5",
-    "react-dom": "19.2.5"
+    }
   },
   "packageManager": "npm@10.9.0",
   "engines": {
     "node": ">=20.0.0"
-  },
-  "dependencies": {
-    "@expo-google-fonts/poppins": "^0.4.1",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5"
   }
 }
